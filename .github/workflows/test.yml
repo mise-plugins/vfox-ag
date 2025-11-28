@@ -29,19 +29,18 @@ jobs:
       - name: Install vfox
         run: |
           curl -sSL https://raw.githubusercontent.com/version-fox/vfox/main/install.sh | bash
-          echo "$HOME/.version-fox/bin" >> $GITHUB_PATH
 
       - name: Add plugin from local directory
         run: |
-          ~/.version-fox/bin/vfox add --source ${{ github.workspace }} ag
+          vfox add --source ${{ github.workspace }} ag
 
       - name: Install ag
         run: |
-          ~/.version-fox/bin/vfox install ag@2.2.0
+          vfox install ag@2.2.0
 
       - name: Test ag
         run: |
-          eval "$(~/.version-fox/bin/vfox activate bash)"
+          eval "$(vfox activate bash)"
           vfox use -g ag@2.2.0
           ag --version
           ag --help
