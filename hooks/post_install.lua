@@ -7,8 +7,20 @@ function PLUGIN:PostInstall(ctx)
     local path = sdkInfo.path
     local version = sdkInfo.version
 
-    -- The tarball extracts to a subdirectory
-    local srcDir = path .. "/the_silver_searcher-" .. version
+    -- First, list the directory to see what was extracted
+    local lsResult = cmd.exec("ls -la '" .. path .. "'")
+    print("Contents of install path: " .. lsResult)
+
+    -- Try to find the source directory
+    -- GitHub tarballs may extract to repo-name-version or just directly
+    local srcDir = path
+    local possibleDir = path .. "/the_silver_searcher-" .. version
+    local checkResult = cmd.exec("test -d '" .. possibleDir .. "' && echo 'exists' || echo 'not found'")
+    if checkResult:find("exists") then
+        srcDir = possibleDir
+    end
+
+    print("Using source directory: " .. srcDir)
 
     --- Run autogen.sh to generate configure script
     local autogenResult, autogenErr = pcall(function()
