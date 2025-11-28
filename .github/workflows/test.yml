@@ -26,21 +26,16 @@ jobs:
         run: |
           brew install automake pkg-config pcre xz
 
-      - name: Install vfox
-        run: |
-          curl -sSL https://raw.githubusercontent.com/version-fox/vfox/main/install.sh | bash
+      - name: Install mise
+        uses: jdx/mise-action@v2
 
-      - name: Add plugin from local directory
+      - name: Install ag using vfox plugin
         run: |
-          vfox add --source ${{ github.workspace }} ag
-
-      - name: Install ag
-        run: |
-          vfox install ag@2.2.0
+          mise install "vfox:${{ github.workspace }}@2.2.0"
 
       - name: Test ag
         run: |
-          eval "$(vfox activate bash)"
-          vfox use -g ag@2.2.0
+          eval "$(mise activate bash)"
+          mise use -g "vfox:${{ github.workspace }}@2.2.0"
           ag --version
           ag --help
