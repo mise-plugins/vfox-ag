@@ -8,12 +8,19 @@ function PLUGIN:Available(ctx)
     local result = {}
     local page = 1
 
+    -- Get GitHub token from environment for rate limiting
+    local github_token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+    local headers = {
+        ["Accept"] = "application/vnd.github.v3+json",
+    }
+    if github_token and github_token ~= "" then
+        headers["Authorization"] = "token " .. github_token
+    end
+
     while true do
         local resp, err = http.get({
             url = "https://api.github.com/repos/ggreer/the_silver_searcher/tags?per_page=100&page=" .. page,
-            headers = {
-                ["Accept"] = "application/vnd.github.v3+json",
-            }
+            headers = headers,
         })
 
         if err ~= nil then
