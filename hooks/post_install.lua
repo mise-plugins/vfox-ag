@@ -13,8 +13,15 @@ function PLUGIN:PostInstall(ctx)
     cmd.exec("cd '" .. srcDir .. "' && ./autogen.sh")
 
     --- Run configure with prefix set to installation path
+    --- Add -fcommon to CFLAGS for GCC 10+ compatibility (fixes multiple definition errors)
     local configureArgs = os.getenv("AG_CONFIGURE_ARGS") or ""
-    cmd.exec("cd '" .. srcDir .. "' && ./configure --prefix='" .. path .. "' " .. configureArgs)
+    local cflags = os.getenv("CFLAGS") or ""
+    if cflags == "" then
+        cflags = "-fcommon"
+    else
+        cflags = cflags .. " -fcommon"
+    end
+    cmd.exec("cd '" .. srcDir .. "' && CFLAGS='" .. cflags .. "' ./configure --prefix='" .. path .. "' " .. configureArgs)
 
     --- Run make
     cmd.exec("cd '" .. srcDir .. "' && make")

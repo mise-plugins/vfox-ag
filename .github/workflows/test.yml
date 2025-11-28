@@ -35,7 +35,5 @@ jobs:
 
       - name: Test ag
         run: |
-          eval "$(mise activate bash)"
-          mise use -g "vfox:mise-plugins/vfox-ag@2.2.0"
-          ag --version
-          ag --help
+          mise x "vfox:mise-plugins/vfox-ag@2.2.0" -- ag --version
+          mise x "vfox:mise-plugins/vfox-ag@2.2.0" -- ag --help
