@@ -1,0 +1,47 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies (Ubuntu)
+        if: startsWith(matrix.os, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y automake pkg-config libpcre3-dev zlib1g-dev liblzma-dev
+
+      - name: Install dependencies (macOS)
+        if: startsWith(matrix.os, 'macos')
+        run: |
+          brew install automake pkg-config pcre xz
+
+      - name: Install vfox
+        run: |
+          curl -sSL https://raw.githubusercontent.com/version-fox/vfox/main/install.sh | bash
+          echo "$HOME/.version-fox/bin" >> $GITHUB_PATH
+
+      - name: Add plugin from local directory
+        run: |
+          ~/.version-fox/bin/vfox add --source ${{ github.workspace }} ag
+
+      - name: Install ag
+        run: |
+          ~/.version-fox/bin/vfox install ag@2.2.0
+
+      - name: Test ag
+        run: |
+          eval "$(~/.version-fox/bin/vfox activate bash)"
+          vfox use -g ag@2.2.0
+          ag --version
+          ag --help
